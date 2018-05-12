@@ -1,0 +1,13 @@
+version: '2.3'
+services:
+  rtmp:
+    build: .
+    image: yukimochi/rtmp_nginx
+    restart: always
+    ports:
+      - "1935:1935"
+    mem_limit: 1024M
+    volumes:
+     - "./static:/static"
+     - "./logs:/var/log/nginx"
+     - "./nginx.conf:/etc/nginx/nginx.conf"

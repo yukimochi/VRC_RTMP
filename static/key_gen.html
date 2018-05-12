@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <title>Instance-Key Generator</title>
+    <script type="text/javascript" src="lib/sha1.js"></script>
+    <script>
+        //var player_url = "https://vrc.yukimochi.jp/publish/endpoint.html";
+        //var endpoint = "rtmp://vrc-rtmp.yukimochi.jp/live";
+
+        function sub_monitor() {
+            return window.parent.screen.width < 1200;
+        }
+        function getParam(name) {
+            url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        function dateString() {
+            var date = new Date();
+            return String(date.getUTCFullYear()) + String(date.getUTCMonth()) + String(date.getUTCDate());
+        }
+        if (getParam("sid") != null) {
+            var hash = new jsSHA("SHA-1", "TEXT");
+            hash.update(dateString() + getParam("sid"));
+            var uid = hash.getHash("HEX").slice(0, 6);
+            setTimeout(location.href = player_url + "?addr=" + encodeURIComponent(endpoint) + "&streamkey=" + uid, 0);
+        }
+    </script>
+    <style>
+        * {
+            font-family: sans-serif;
+        }
+
+        h1 {
+            font-size: 80pt;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 60pt;
+        }
+
+        h3 {
+            font-size: 40pt;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main" style="margin: 35px">
+        <h1>Welcome to VRChat-RTMP Gateway</h1>
+        <h2>Made by YUKIMOCHI</h2>
+        <br />
+        <h2>Please push initialize button first</h2>
+        <h2>and you get endpoint url and streamkey.</h2>
+        <h3>Powered by
+            <br />
+            <img src="img/ConoHa.png" height="120" />
+            <img src="img/Nginx.png" height="120" />
+        </h3>
+    </div>
+    <div id="sub" hidden>
+        <h1 style="text-align:center">Wait for Initialize...</h1>
+    </div>
+    <script>
+        if (sub_monitor()) {
+            document.getElementById('main').hidden = true;
+            document.getElementById('sub').hidden = false;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <title>YUKIMOCHI RTMP-VRChat Gateway</title>
+    <script>
+        function IsSubMonitor() {
+            return window.parent.screen.width < 1200;
+        }
+        function GetQuery(name) {
+            url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+    </script>
+    <style>
+        * {
+            font-family: sans-serif;
+            background-color: #000000;
+        }
+
+        .noflash {
+            color: #ffffff;
+        }
+
+        .adobe {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <object WIDTH="1920" HEIGHT="1080" data="bin/VRC_RTMP.swf" type="application/x-shockwave-flash">
+            <param id="Connection" name=FlashVars value="" />
+            <div style="margin: 35px">
+                <h1 class="noflash" style="font-size: 80pt">
+                    This world required
+                    <span class="adobe">Adobe Flash Player</span>.
+                </h1>
+                <h2 class="noflash" style="font-size: 60pt">
+                    Please install
+                    <span class="adobe">Adobe Flash Player</span> NPAPI.
+                    <br /> (aka.
+                    <span class="adobe">Adobe Flash Player</span> For Firefox)
+                </h2>
+                <h2 class="noflash" style="font-size: 60pt">URL : https://get.adobe.com/flashplayer</h2>
+            </div>
+        </object>
+    </div>
+    <div id="sub" hidden>
+        <h1 id="Endpoint_Notice" style="color: white; margin: 10px 10px"></h1>
+    </div>
+    <script>
+        var notice = "\nRecommend Setting : 1920x1080 Video 2000Kbps Audio 128Kbps"
+        if (IsSubMonitor()) {
+            document.getElementById('main').hidden = true;
+            document.getElementById('sub').hidden = false;
+            document.getElementById('Endpoint_Notice').innerText = "Endpoint : " + decodeURIComponent(GetQuery('addr')) + "\nStreamKey : " + GetQuery('streamkey') + notice;
+        } else {
+            document.getElementById('Connection').value = "addr=" + GetQuery('addr') + "&streamkey=" + GetQuery('streamkey');
+        }
+    </script>
+</body>
+
+</html>
