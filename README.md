@@ -102,6 +102,8 @@ rtmp {
 
  ````
 
+ ※ 設定変更後は、 `sudo docker-compose stop` と `sudo docker-compose start` で必ず再起動します。
+
 ### ワールドの設定
  6. -1 （全てのワールドで1つの配信を見せる場合）ワールドの Web Panel にプレーヤーの URL を設定します。
 
