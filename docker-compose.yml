@@ -5,6 +5,7 @@ services:
     image: yukimochi/rtmp_nginx
     restart: always
     ports:
+      - "80:80"
       - "1935:1935"
     mem_limit: 1024M
     volumes:
