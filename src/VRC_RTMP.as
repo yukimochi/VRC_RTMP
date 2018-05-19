@@ -8,6 +8,8 @@ import flash.events.NetStatusEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
 import flash.media.Video;
+import flash.media.SoundTransform;
+import flash.external.ExternalInterface;
 
 [SWF(backgroundColor="0x000000")]
 public class VRC_RTMP extends Sprite {
@@ -22,6 +24,7 @@ public class VRC_RTMP extends Sprite {
         setupNetConnection();
         setupVideo();
         nc.connect(flashvars.addr);
+        ExternalInterface.addCallback("audio_control", addAudioControlCallback);
     }
 
     private function setupStage():void {
@@ -53,6 +56,15 @@ public class VRC_RTMP extends Sprite {
             setupNetStream();
             ns.play(flashvars.streamkey);
         }
+    }
+
+    private function transformChangeHandler(volume:Number, pan:Number):void {
+        var transform:SoundTransform = new SoundTransform(volume,pan);
+        ns.soundTransform = transform;
+    }
+
+    private function addAudioControlCallback(volume:int,pan:int):void {
+        transformChangeHandler(volume/100, pan/100);
     }
 }
 

@@ -13,6 +13,18 @@ VRChat で RTMP ベースの生配信をインスタンスに対して行うた�
 location.href="http://example.jp/endpoint.html?addr=*******&streamkey=******"
 ````
 
+また、 javascript の `audio_control` 関数を実行することで、オーディオの音量とパン（左右の音量割合）を変更できます。
+
+#### audio_control (volume:Number, pan:Number)
+  - volume (Number) : 音量を設定する。 `0 ~ 100` までの整数値。初期設定では `100` 。 `100` を超えるとなんかやばい音がする。
+  - pan (Number) : 左右の音のふり具合を設定する。 `-100` (左に全振り) ~ `100` (右に全振り) まで設定可能。初期設定では `0` 。
+
+  例：( `Set-WebPanelURI` や ブックマークレット)
+  ````
+  javascript:setTimeout(audio_control(50,0),0);
+  ````
+  謎： VRChat の `Set-WebPanelURI` で動かすブックマークレットは、 setTimeout でラップしないと動かないの多いよね。なんでかは知らない。 Vorlon.js のコンソールからなら普通に呼んでも使えた。
+
 ### Instance ごとに異なる StreamKey を提供する仕組み
  - YUKIMOCHI VRC_RTMP Instance Key Gen (`static/key_gen.html`)
 

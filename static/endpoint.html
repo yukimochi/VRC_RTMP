@@ -18,6 +18,13 @@
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
+        function Contact_AS(swf) {
+            if (navigator.appName.indexOf("Microsoft") != -1) {
+                return window[swf];
+            } else {
+                return document[swf];
+            }
+        }
     </script>
     <style>
         * {
@@ -37,7 +44,7 @@
 
 <body>
     <div id="main">
-        <object WIDTH="1920" HEIGHT="1080" data="bin/VRC_RTMP.swf" type="application/x-shockwave-flash">
+        <object id="VRC_RTMP" WIDTH="1920" HEIGHT="1080" data="bin/VRC_RTMP.swf" type="application/x-shockwave-flash">
             <param id="Connection" name=FlashVars value="" />
             <div style="margin: 35px">
                 <h1 class="noflash" style="font-size: 80pt">
@@ -65,6 +72,9 @@
             document.getElementById('Endpoint_Notice').innerText = "Endpoint : " + decodeURIComponent(GetQuery('addr')) + "\nStreamKey : " + GetQuery('streamkey') + notice;
         } else {
             document.getElementById('Connection').value = "addr=" + GetQuery('addr') + "&streamkey=" + GetQuery('streamkey');
+        }
+        function audio_control(volume, pan) {
+            Contact_AS("VRC_RTMP").audio_control(volume, pan);
         }
     </script>
 </body>
