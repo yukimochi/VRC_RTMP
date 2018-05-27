@@ -1,0 +1,13 @@
+image: yukimochi/vrc_rtmp:latest
+manifests:
+  -
+    image: yukimochi/vrc_rtmp:latest-amd64
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: yukimochi/vrc_rtmp:latest-aarch64
+    platform:
+      architecture: arm64
+      variant: v8
+      os: linux
