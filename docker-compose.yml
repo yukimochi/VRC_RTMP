@@ -1,7 +1,7 @@
 version: '2.3'
 services:
   rtmp:
-    image: yukimochi/rtmp_nginx:latest
+    image: yukimochi/vrc_rtmp:latest
     restart: always
     ports:
       - "80:80"
