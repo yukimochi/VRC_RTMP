@@ -7,8 +7,7 @@
     <title>Instance-Key Generator</title>
     <script type="text/javascript" src="lib/sha1.js"></script>
     <script>
-        //var player_url = "https://vrc.yukimochi.jp/publish/endpoint.html";
-        //var endpoint = "rtmp://vrc-rtmp.yukimochi.jp/live";
+        var endpoint = "rtmp://" + window.location.host + "/live";
 
         function sub_monitor() {
             return window.parent.screen.width < 1200;
@@ -30,7 +29,7 @@
             var hash = new jsSHA("SHA-1", "TEXT");
             hash.update(dateString() + getParam("sid"));
             var uid = hash.getHash("HEX").slice(0, 6);
-            setTimeout(location.href = player_url + "?addr=" + encodeURIComponent(endpoint) + "&streamkey=" + uid, 0);
+            setTimeout(location.href = "./endpoint.html?addr=" + encodeURIComponent(endpoint) + "&streamkey=" + uid, 0);
         }
     </script>
     <style>
@@ -56,15 +55,9 @@
 <body>
     <div id="main" style="margin: 35px">
         <h1>Welcome to VRChat-RTMP Gateway</h1>
-        <h2>Made by YUKIMOCHI</h2>
         <br />
         <h2>Please push initialize button first</h2>
         <h2>and you get endpoint url and streamkey.</h2>
-        <h3>Powered by
-            <br />
-            <img src="img/ConoHa.png" height="120" />
-            <img src="img/Nginx.png" height="120" />
-        </h3>
     </div>
     <div id="sub" hidden>
         <h1 style="text-align:center">Wait for Initialize...</h1>
