@@ -33,11 +33,8 @@ VRChat で同一ワールドのインスタンスが複数建てられた場合�
 クエリ文字列 `sid` が与えられると、日付と混ぜられてストリームキーが生成される。
 
 （ストリームキーは、クエリ文字列 `sid` と UTC での日付で決定される。）
-````
-var player_url = "https://vrc.yukimochi.jp/publish/endpoint.html";
-var endpoint = "rtmp://vrc-rtmp.yukimochi.jp/live";
-````
-また、当該 html 冒頭の変数にあるようなアドレスに、 VRC_RTMP Player に対応したクエリ文字列を付与して勝手に リダイレクトする。
+
+また、 VRC_RTMP Player に生成されたストリームキーを付与してリダイレクトする。
 
 `sid` をインスタンスごとにランダムにする"かつ"、あとから入室したユーザにも同じ値を提供するには、 `VRC_Trigger` の `Randomize` を有効にして、大量に `sid` を埋め込んだ URL を入れておくしかない。
 
@@ -76,7 +73,7 @@ sudo docker-compose up -d //サーバが起動します。
 
  3. `http://<サーバのIPアドレス>/key_gen.html` にアクセスすると、`static/key_gen.html` を見ることができるか確認する。
  4. `rtmp://<サーバのIPアドレス>/live` に RTMP 配信（OBS-Studio など使用）できるか確認する。
- 5. セキュリティを確保するため、`nginx.conf` を変更します。
+ 5. -1 セキュリティを確保するため、`nginx.conf` を変更します。
 
   - 変更前
  ````nginx.conf 
@@ -115,6 +112,44 @@ rtmp {
  ````
 
  ※ 設定変更後は、 `sudo docker-compose stop` と `sudo docker-compose start` で必ず再起動します。
+
+ 5. -2 配信状況の統計情報を表示できるようにしたい場合、コメントアウトされた以下の部分を修正します。
+  - 変更前
+ ````
+    # Comment out to enable statistics.
+    #location /statistics/view {
+    #  rtmp_stat all;
+    #  rtmp_stat_stylesheet /stat.xsl;
+    #}
+ ````
+
+  - 変更後
+ ````
+    # Comment out to enable statistics.
+    location /statistics/view {
+      rtmp_stat all;
+      rtmp_stat_stylesheet /stat.xsl;
+    }
+ ````
+
+ 設定適応後は、 `http://<サーバのIPアドレス>/statistics/view` にアクセスすると、以下のような統計情報を確認できます。
+
+ ![RTMP Statisstics](./docs/stat.png)
+
+ 5. -3 YouTube Live など他の配信サービスに配信を転送したい場合、以下の部分を修正します。
+ 
+ （注：この設定をすると、ストリームキーをずらしても2つ以上の配信を同時に受けることができなくなります。）
+  - 変更前
+ ````
+      # Comment out to enable relay to YouTube Live etc...
+      #push rtmp://a.rtmp.youtube.com/live*/***********
+ ````
+
+  - 変更後
+ ````
+      # Comment out to enable relay to YouTube Live etc...
+      push rtmp://a.rtmp.youtube.com/live*/***********　//あなたの配信したいプラットフォームのRTMPアドレスを指定します。
+ ````
 
 ### ワールドの設定
  6. -1 （全てのワールドで1つの配信を見せる場合）ワールドの Web Panel にプレーヤーの URL を設定します。
