@@ -76,7 +76,7 @@ sudo docker-compose up -d //サーバが起動します。
  5. -1 セキュリティを確保するため、`nginx.conf` を変更します。
 
   - 変更前
- ````nginx.conf 
+ ````nginx.conf
 rtmp {
   server {
     listen 1935;
@@ -87,10 +87,25 @@ rtmp {
       allow publish all; //誰でも、配信が可能になっている。（上が優先度大）
       deny publish all; //この設定は、無視される。
       allow play all;
+
+      on_publish http://auth:3000/auth;
+    }
+
+    # Comment out to enable relay to YouTube Live etc...
+    #application multi {
+    #  live on;
+    #  record off;
+    #  allow publish all;
+    #  deny publish all;
+    #  allow play all;
+
+    #  on_publish http://auth:3000/auth;
+
+    #  push rtmp://a.rtmp.youtube.com/live*/***********
+    #  push rtmp://live-tyo.twitch.tv/app/***********
     }
   }
 }
-
  ````
 
   - 変更後
@@ -105,6 +120,20 @@ rtmp {
       allow publish <配信PCのグローバルIPアドレス>; //自分のIPアドレス以外の配信は、許可されない。
       deny publish all; //上の条件に満たない場合、この条件によって配信が禁止される。
       allow play all;
+    }
+
+    # Comment out to enable relay to YouTube Live etc...
+    #application multi {
+    #  live on;
+    #  record off;
+    #  allow publish all;
+    #  deny publish all;
+    #  allow play all;
+
+    #  on_publish http://auth:3000/auth;
+
+    #  push rtmp://a.rtmp.youtube.com/live*/***********
+    #  push rtmp://live-tyo.twitch.tv/app/***********
     }
   }
 }
@@ -136,23 +165,77 @@ rtmp {
 
  ![RTMP Statisstics](./docs/stat.png)
 
- 5. -3 YouTube Live など他の配信サービスに配信を転送したい場合、以下の部分を修正します。
- 
- （注：この設定をすると、ストリームキーをずらしても2つ以上の配信を同時に受けることができなくなります。）
+ 5. -3 YouTube Live など他の配信サービスに配信を転送したい場合、 `rtmp://<サーバのIPアドレス>/multi` へ配信するようにします。 それに伴い、以下の通りに設定を変更します。
+
   - 変更前
- ````
-      # Comment out to enable relay to YouTube Live etc...
-      #push rtmp://a.rtmp.youtube.com/live*/***********
+ ```` 
+    # Comment out to enable relay to YouTube Live etc...
+    #application multi {
+    #  live on;
+    #  record off;
+    #  allow publish all;
+    #  deny publish all;
+    #  allow play all;
+
+    #  on_publish http://auth:3000/auth;
+
+    #  push rtmp://a.rtmp.youtube.com/live*/***********
+    #  push rtmp://live-tyo.twitch.tv/app/***********
+    }
  ````
 
   - 変更後
  ````
-      # Comment out to enable relay to YouTube Live etc...
-      push rtmp://a.rtmp.youtube.com/live*/***********　//あなたの配信したいプラットフォームのRTMPアドレスを指定します。
+    # Comment out to enable relay to YouTube Live etc...
+    application multi {
+      live on;
+      record off;
+      allow publish all;
+      deny publish all;
+      allow play all;
+
+      on_publish http://auth:3000/auth;
+
+      push rtmp://a.rtmp.youtube.com/live*/*********** //あなたの配信したいプラットフォームのRTMPアドレスを指定します。
+      push rtmp://live-tyo.twitch.tv/app/*********** //あなたの配信したいプラットフォームのRTMPアドレスを指定します。
+    }
+ ````
+
+ 6. 配信に利用できるストリームキーを設定するため `auth.json` を変更します。
+ 
+  - 変更前
+ ````
+ {
+    "application": {
+        "live": [
+            "stream",
+            "sub_stream"
+        ],
+        "multi": [
+            "multi_stream"
+        ]
+    }
+}
+ ````
+
+  - 変更後
+ ````
+ {
+    "application": {
+        "live": [
+            "<配信に使いたいストリームキー1>",
+            "<配信に使いたいストリームキー2>",
+            "<配信に使いたいストリームキー3>"  //数は無制限。
+        ],
+        "multi": [
+            "<転送配信に使いたいストリームキー>" //1つまで。
+        ]
+    }
+}
  ````
 
 ### ワールドの設定
- 6. -1 （全てのワールドで1つの配信を見せる場合）ワールドの Web Panel にプレーヤーの URL を設定します。
+ 7. -1 （全てのワールドで1つの配信を見せる場合）ワールドの Web Panel にプレーヤーの URL を設定します。
 
  プレーヤーは、 `addr` 変数に URL エンコードしたサーバアドレス、 `streamkey` にストリームキーを設定します。
  （ここで決定したストリームキーで配信することになります。）
@@ -161,13 +244,17 @@ rtmp {
 
  `endpoint.html` は、 1940*1100 で表示されることを期待しています。
 
+ ※ 転送配信側 ( `/multi` ) を視聴する場合、以下のプレーヤーの URL を設定します。
+
+ `http://<サーバのIPアドレス>/endpoint.html?addr=rtmp%3A%2F%2F<サーバのIPアドレス>%2Fmulti&streamkey=<ストリームキー>`
+
  設定の参考：
  
  ![Unity設定例](docs/unity.png)
 
- 6. -2（インスタンスごとに別の配信を見せたいとき） ＜略＞
+ 7. -2（インスタンスごとに別の配信を見せたいとき） ＜略＞
 
- 7. 色合いがおかしい件の修正。
+ 8. 色合いがおかしい件の修正。
 
  Web Panel では、色の発色がおかしいという現象が[見つかっています](http://uuupa.hatenablog.com/entry/2018/04/05/003936)。
 

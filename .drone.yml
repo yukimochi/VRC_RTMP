@@ -7,3 +7,9 @@ pipeline:
     repo: yukimochi/vrc_rtmp
     secrets: [ docker_username, docker_password ]
     tags: latest-aarch64
+  docker:
+    dockerfile: ./auth/Dockerfile
+    image: plugins/docker:linux-arm64
+    repo: yukimochi/vrc_rtmp
+    secrets: [ docker_username, docker_password ]
+    tags: auth-aarch64
