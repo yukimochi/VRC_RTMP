@@ -111,13 +111,13 @@ func main() {
 		fmt.Println(build("nginx_rtmp.live.clients.clients", strconv.Itoa(data.Server[0].Application[0].Live[0].Nclients), time))
 		streams := data.Server[0].Application[0].Live[0].Stream
 		for key := range streams {
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".media_bandwidth.audio", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Bw_audio), time))
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".media_bandwidth.video", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Bw_video), time))
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".clients.clients", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Nclients), time))
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".bandwidth.in", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Bw_in), time))
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".bandwidth.out", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Bw_out), time))
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".transmited.in", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Bytes_in), time))
-			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".transmited.out", strconv.Itoa(data.Server[0].Application[0].Live[0].Stream[key].Bytes_out), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".media_bandwidth.audio", strconv.Itoa(streams[key].Bw_audio), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".media_bandwidth.video", strconv.Itoa(streams[key].Bw_video), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".clients.clients", strconv.Itoa(streams[key].Nclients), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".bandwidth.in", strconv.Itoa(streams[key].Bw_in), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".bandwidth.out", strconv.Itoa(streams[key].Bw_out), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".transmited.in", strconv.Itoa(streams[key].Bytes_in), time))
+			fmt.Println(build("nginx_rtmp.live.stream."+streams[key].Name+".transmited.out", strconv.Itoa(streams[key].Bytes_out), time))
 		}
 	}
 }
@@ -125,7 +125,7 @@ func main() {
 func fetch(url string) *Rtmp {
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("HTTP Get error:", err)
+		fmt.Fprintln(os.Stderr, "HTTP Get error:", err)
 		return nil
 	}
 	defer resp.Body.Close()
@@ -135,7 +135,7 @@ func fetch(url string) *Rtmp {
 
 	data := new(Rtmp)
 	if err := xml.Unmarshal([]byte(raw), data); err != nil {
-		fmt.Println("XML Unmarshal error:", err)
+		fmt.Fprintln(os.Stderr, "XML Unmarshal error:", err)
 		return nil
 	}
 	return data
