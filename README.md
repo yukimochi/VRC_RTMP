@@ -258,4 +258,5 @@ rtmp {
 
  Web Panel では、色の発色がおかしいという現象が[見つかっています](http://uuupa.hatenablog.com/entry/2018/04/05/003936)。
 
- Duplicate Screen で、 [UUUPA/Degamma (MIT Licence)](https://github.com/UUUPA/Degamma) などのシェーダを適用するとよい。
+ Duplicate Screen で、 [yukimochi/WebPanel-Shaders](https://github.com/yukimochi/WebPanel-Shaders
+) などの代替シェーダを適用します。
