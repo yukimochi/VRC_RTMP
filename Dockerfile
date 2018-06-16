@@ -1,6 +1,6 @@
 FROM alpine:edge
 
-ENV NGINX_VERSION 1.14.0
+ENV NGINX_VERSION 1.15.0
 ENV NGINX_RTMP_MODULE_VERSION 1.2.1
 
 RUN adduser -s /sbin/nologin -D -H nginx
