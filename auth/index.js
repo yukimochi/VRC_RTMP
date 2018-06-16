@@ -36,11 +36,12 @@ http.createServer(function (req, res) {
         req.on('end', () => {
             var param = {
                 "app": GetQuery("app", body),
-                "name": GetQuery("name", body)
+                "name": GetQuery("name", body),
+                "pub_key": GetQuery("pub_key", body)
             };
-
+            console.log(JSON.stringify(param))
             if (param.app in auth.application) {
-                if (auth.application[param.app].indexOf(param.name) > -1) {
+                if (param.name in auth.application[param.app] && param.pub_key == auth.application[param.app][param.name]) {
                     console.log('Allow publishing : ' + param.app + "/" + param.name);
                     res.writeHead(204, { "Content-Type": "text/plain" });
                     res.write("204 No Content\n");
