@@ -6,9 +6,6 @@
     <meta name="robots" content="noindex">
     <title>YUKIMOCHI RTMP-VRChat Gateway</title>
     <script>
-        function IsSubMonitor() {
-            return window.parent.screen.width < 1200;
-        }
         function GetQuery(name) {
             url = window.location.href;
             name = name.replace(/[\[\]]/g, "\\$&");
@@ -17,6 +14,13 @@
             if (!results) return null;
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        function IsSubMonitor() {
+            if (GetQuery("allow_control") == "true" && window.parent.screen.width < 1200) {
+                return true;
+            } else {
+                return false;
+            }
         }
         function Contact_AS(swf) {
             if (navigator.appName.indexOf("Microsoft") != -1) {

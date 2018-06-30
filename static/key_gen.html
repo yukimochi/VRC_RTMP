@@ -29,7 +29,7 @@
             var hash = new jsSHA("SHA-1", "TEXT");
             hash.update(dateString() + getParam("sid"));
             var uid = hash.getHash("HEX").slice(0, 6);
-            setTimeout(location.href = "./endpoint.html?addr=" + encodeURIComponent(endpoint) + "&streamkey=" + uid, 0);
+            setTimeout(location.href = "./endpoint.html?allow_control=true&addr=" + encodeURIComponent(endpoint) + "&streamkey=" + uid, 0);
         }
     </script>
     <style>
