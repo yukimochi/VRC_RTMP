@@ -1,1 +1,0 @@
-mxmlc -static-link-runtime-shared-libraries=true --output=VRC_RTMP.swf VRC_RTMP.as

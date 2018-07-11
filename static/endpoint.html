@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex">
-    <title>YUKIMOCHI RTMP-VRChat Gateway</title>
+    <title>VRChat RTMP Gateway - Video Player</title>
+    <link href="lib/video-js.css" rel="stylesheet">
+    <script src="lib/video.js"></script>
+    <script src="lib/videojs-flash.min.js"></script>
     <script>
         function GetQuery(name) {
             url = window.location.href;
@@ -29,41 +32,24 @@
                 return document[swf];
             }
         }
+        var sid = GetQuery('instance');
     </script>
     <style>
-        * {
-            font-family: sans-serif;
+        body {
             background-color: #000000;
-        }
-
-        .noflash {
-            color: #ffffff;
-        }
-
-        .adobe {
-            color: red;
         }
     </style>
 </head>
 
 <body>
     <div id="main">
-        <object id="VRC_RTMP" WIDTH="1920" HEIGHT="1080" data="bin/VRC_RTMP.swf" type="application/x-shockwave-flash">
-            <param id="Connection" name=FlashVars value="" />
-            <div style="margin: 35px">
-                <h1 class="noflash" style="font-size: 80pt">
-                    This world required
-                    <span class="adobe">Adobe Flash Player</span>.
-                </h1>
-                <h2 class="noflash" style="font-size: 60pt">
-                    Please install
-                    <span class="adobe">Adobe Flash Player</span> NPAPI.
-                    <br /> (aka.
-                    <span class="adobe">Adobe Flash Player</span> For Firefox)
-                </h2>
-                <h2 class="noflash" style="font-size: 60pt">URL : https://get.adobe.com/flashplayer</h2>
-            </div>
-        </object>
+        <div class="container">
+            <section class="starter-template">
+                <video autoplay id="VRC_RTMP" width="1920" height="1080" class="video-js vjs-default-skin">
+                    <source id="Connection" src="" type="rtmp/mp4">
+                </video>
+            </section>
+        </div>
     </div>
     <div id="sub" hidden>
         <h1 id="Endpoint_Notice" style="color: white; margin: 10px 10px"></h1>
@@ -75,11 +61,17 @@
             document.getElementById('sub').hidden = false;
             document.getElementById('Endpoint_Notice').innerText = "Endpoint : " + decodeURIComponent(GetQuery('addr')) + "\nStreamKey : " + GetQuery('streamkey') + notice;
         } else {
-            document.getElementById('Connection').value = "addr=" + GetQuery('addr') + "&streamkey=" + GetQuery('streamkey');
+            var src = decodeURIComponent(GetQuery('addr')) + "/" + GetQuery('streamkey');
+            document.getElementById('Connection').setAttribute('src', src);
         }
-        function audio_control(volume, pan) {
-            Contact_AS("VRC_RTMP").audio_control(volume, pan);
+        function audio_control(volume) {
+            Contact_AS("VRC_RTMP_Flash_api").vjs_setProperty('volume', volume / 100);
         }
+    </script>
+    <script>
+        (function (window, videojs) {
+            var player = window.player = videojs('VRC_RTMP');
+        }(window, window.videojs));
     </script>
 </body>
 
