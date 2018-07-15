@@ -21,3 +21,13 @@ services:
     mem_limit: 64M
     volumes:
       - "./auth.json:/auth/auth.json"
+
+  # Statistics exporter.
+  # exporter:
+  #   build: ./misc/nginx_rtmp_exporter
+  #   image: yukimochi/vrc_rtmp:nginx_rtmp_exporter
+  #   restart: always
+  #   ports:
+  #     - "9100:9100"
+  #   mem_limit: 64M
+  #   command: /usr/bin/nginx_rtmp_exporter --url=http://rtmp/statistics/view
