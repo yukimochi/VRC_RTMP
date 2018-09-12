@@ -6,7 +6,13 @@ manifests:
       architecture: amd64
       os: linux
   -
-    image: yukimochi/vrc_rtmp:latest-aarch64
+    image: yukimochi/vrc_rtmp:latest-arm
+    platform:
+      architecture: arm
+      variant: v6
+      os: linux
+  -
+    image: yukimochi/vrc_rtmp:latest-arm64
     platform:
       architecture: arm64
       variant: v8

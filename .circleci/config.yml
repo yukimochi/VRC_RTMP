@@ -1,0 +1,208 @@
+version: 2
+jobs:
+  docker-rtmp-amd64:
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: build docker image
+          command: |
+            docker build -t ${DOCKER_USER}/vrc_rtmp:latest-amd64 .
+      - run:
+          name: upload image to docker hub.
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            docker push ${DOCKER_USER}/vrc_rtmp:latest-amd64
+
+  docker-rtmp-arm:
+    machine:
+      image: circleci/classic:edge
+    steps:
+      - checkout
+      - run:
+          name: Activate qemu
+          command: |
+            sudo docker run --rm --privileged multiarch/qemu-user-static:register --reset
+            wget https://github.com/multiarch/qemu-user-static/releases/download/v2.12.0-1/qemu-arm-static
+            chmod +x qemu-arm-static
+      - run:
+          name: Change Dockerfile
+          command: |
+            sed -i -e "s/alpine:/arm32v6\/alpine:/" Dockerfile
+            sed -i -e "2i ADD qemu-arm-static /usr/bin" Dockerfile
+      - run:
+          name: build docker image
+          command: |
+            docker build -t ${DOCKER_USER}/vrc_rtmp:latest-arm .
+      - run:
+          name: upload image to docker hub.
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            docker push ${DOCKER_USER}/vrc_rtmp:latest-arm
+
+  docker-rtmp-arm64:
+    machine:
+      image: circleci/classic:edge
+    steps:
+      - checkout
+      - run:
+          name: Activate qemu
+          command: |
+            sudo docker run --rm --privileged multiarch/qemu-user-static:register --reset
+            wget https://github.com/multiarch/qemu-user-static/releases/download/v2.12.0-1/qemu-aarch64-static
+            chmod +x qemu-aarch64-static
+      - run:
+          name: Change Dockerfile
+          command: |
+            sed -i -e "s/alpine:/arm64v8\/alpine:/" Dockerfile
+            sed -i -e "2i ADD qemu-aarch64-static /usr/bin" Dockerfile
+      - run:
+          name: build docker image
+          command: |
+            docker build -t ${DOCKER_USER}/vrc_rtmp:latest-arm64 .
+      - run:
+          name: upload image to docker hub.
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            docker push ${DOCKER_USER}/vrc_rtmp:latest-arm64
+
+  docker-rtmp-manifest:
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install manifest-tool
+          command: |
+            wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64 -O /usr/bin/manifest-tool
+            chmod +x /usr/bin/manifest-tool
+      - run:
+          name: Push manifest
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            manifest-tool push from-spec manifest.yaml
+
+  docker-auth-amd64:
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: build docker image
+          command: |
+            cd auth
+            docker build -t ${DOCKER_USER}/vrc_rtmp:auth-amd64 .
+      - run:
+          name: upload image to docker hub.
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            docker push ${DOCKER_USER}/vrc_rtmp:auth-amd64
+
+  docker-auth-arm:
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Change Dockerfile
+          command: |
+            sed -i -e "s/alpine:/arm32v6\/alpine:/" Dockerfile
+      - run:
+          name: build docker image
+          command: |
+            cd auth
+            docker build -t ${DOCKER_USER}/vrc_rtmp:auth-arm .
+      - run:
+          name: upload image to docker hub.
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            docker push ${DOCKER_USER}/vrc_rtmp:auth-arm
+
+  docker-auth-arm64:
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Change Dockerfile
+          command: |
+            sed -i -e "s/alpine:/arm64v8\/alpine:/" Dockerfile
+      - run:
+          name: build docker image
+          command: |
+            cd auth
+            docker build -t ${DOCKER_USER}/vrc_rtmp:auth-arm64 .
+      - run:
+          name: upload image to docker hub.
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            docker push ${DOCKER_USER}/vrc_rtmp:auth-arm64
+
+  docker-auth-manifest:
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install manifest-tool
+          command: |
+            wget https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64 -O /usr/bin/manifest-tool
+            chmod +x /usr/bin/manifest-tool
+      - run:
+          name: Push manifest
+          command: |
+            cd auth
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+            manifest-tool push from-spec manifest.yaml
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - docker-rtmp-amd64:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-rtmp-arm:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-rtmp-arm64:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-rtmp-manifest:
+          requires:
+            - docker-rtmp-amd64
+            - docker-rtmp-arm
+            - docker-rtmp-arm64
+      - docker-auth-amd64:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-auth-arm:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-auth-arm64:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-auth-manifest:
+          requires:
+            - docker-auth-amd64
+            - docker-auth-arm
+            - docker-auth-arm64
